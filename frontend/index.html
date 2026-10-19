@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartNDLI</title>
+<style>
+  body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 16px}
+  input{width:70%;padding:10px;font-size:16px}
+  button{padding:10px 16px;font-size:16px}
+  .card{border:1px solid #ddd;border-radius:8px;padding:12px;margin-top:12px}
+  .score{color:#666;font-size:13px}
+</style>
+</head>
+<body>
+<h1>SmartNDLI</h1>
+<input id="q" placeholder="Search books (Hindi / English)">
+<button onclick="search()">Search</button>
+<div id="results"></div>
+<script>
+async function search(){
+  const q = document.getElementById('q').value.trim();
+  if(!q) return;
+  const box = document.getElementById('results');
+  box.innerHTML = 'Searching...';
+  try{
+    const r = await fetch('http://127.0.0.1:8000/search?q=' + encodeURIComponent(q) + '&limit=5');
+    const data = await r.json();
+    box.innerHTML = data.map(b =>
+      `<div class="card"><b>${b.title}</b><br>${b.author}<br>${b.desc}<br><span class="score">match: ${b.score}</span></div>`
+    ).join('');
+  }catch(e){
+    box.innerHTML = 'Backend chalu nahi hai. Pehle uvicorn chalao.';
+  }
+}
+document.getElementById('q').addEventListener('keydown', e => { if(e.key === 'Enter') search(); });
+</script>
+</body>
+</html>
